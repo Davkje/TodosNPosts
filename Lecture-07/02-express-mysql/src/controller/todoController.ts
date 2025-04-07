@@ -1,14 +1,24 @@
 import { Request, Response } from "express";
-// import { Todo } from "../models/Todo";
 import { db } from "../config/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
-// const todos: Todo[] = [new Todo("AAA"), new Todo("BBB"), new Todo("CCC", true), new Todo("Handla mat"), new Todo("Käka mat", true), new Todo("Diska"), new Todo("Diska")];
-
-// FETCH ALL TODOS
+// FETCH ALL TODOS (med sökning via query)
 export const fetchAllTodos = async (req: Request, res: Response) => {
+	const search = req.query.search as string | undefined;
+  const sort = req.query.sort as string || "asc";
+
 	try {
-		const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM todos");
+		let sql = "SELECT * FROM todos";
+		const values: any[] = [];
+
+		if (search) {
+			sql += " WHERE content LIKE ?";
+			values.push(`%${search}%`);
+		}
+
+		sql += " ORDER BY content " + (sort === "desc" ? "DESC" : "ASC");
+
+		const [rows] = await db.query<RowDataPacket[]>(sql, values);
 		res.json(rows);
 	} catch (error: unknown) {
 		const message = error instanceof Error ? error.message : "Unknown error";

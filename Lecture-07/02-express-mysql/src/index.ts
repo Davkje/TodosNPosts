@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
 import { connectToDatabase } from "./config/db";
 
 const app = express();
@@ -15,6 +16,15 @@ app.use("/todos", todoRouter);
 
 import postRouter from "./routes/posts";
 app.use("/posts", postRouter);
+
+// STATIC FILES
+const publicPatch = path.join(__dirname, "../public");
+app.use(express.static(publicPatch));
+
+//FALLBACK
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicPatch, "index.html"));
+});
 
 // Connect To DB
 connectToDatabase();

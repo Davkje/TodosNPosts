@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Todo N' Posts</title>
+		<link rel="stylesheet" href="style/main.css" />
+	</head>
+	<body>
+		<h1>Todo & Posts</h1>
+
+		<section>
+			<h2>Todos</h2>
+			<input type="text" id="todoSearch" placeholder="Sök Todo" />
+			<select name="Sort" id="todoSort">
+				<option value="asc">Ascending</option>
+				<option value="desc">Descending</option>
+			</select>
+			<div id="todos"></div>
+		</section>
+
+		<section>
+			<h2>Posts</h2>
+			<input type="text" id="postSearch" placeholder="Sök Post" />
+			<select name="Sort" id="postSort">
+				<option value="asc">Ascending</option>
+				<option value="desc">Descending</option>
+			</select>
+			<div id="posts"></div>
+		</section>
+
+		<script src="main.js" defer></script>
+	</body>
+</html>

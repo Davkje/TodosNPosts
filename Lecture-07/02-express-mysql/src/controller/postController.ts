@@ -4,13 +4,27 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 // FETCH ALL POSTS
 export const fetchAllPosts = async (req: Request, res: Response) => {
-  try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM posts");
-    res.json(rows);
-  } catch (error: unknown) {
-    const message = error  instanceof Error ? error.message : "Unknown error";
-    res.status(500).json({ error: message });
-  }
+	const search = req.query.search as string | undefined;
+  const sort = req.query.sort as string || "asc";
+
+	try {
+		let sql = "SELECT * FROM posts";
+		const values: any[] = [];
+
+		if (search) {
+			sql += " WHERE content LIKE ? OR author LIKE ? OR title LIKE ?";
+			values.push(`%${search}%`, `%${search}%`, `%${search}%`);
+		}
+
+    // Lägg till ORDER BY för sortering
+		sql += " ORDER BY title " + (sort === "desc" ? "DESC" : "ASC");
+
+		const [rows] = await db.query<RowDataPacket[]>(sql, values);
+		res.json(rows);
+	} catch (error: unknown) {
+		const message = error instanceof Error ? error.message : "Unknown error";
+		res.status(500).json({ error: message });
+	}
 };
 
 // FETCH POST
