@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { db } from "../config/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
-// FETCH ALL TODOS W. SEARCH AND SORT
-export const fetchAllTodos = async (req: Request, res: Response) => {
+// FETCH ALL SUBTASKS W. SEARCH AND SORT
+export const fetchAllSubtasks = async (req: Request, res: Response) => {
 	const search = req.query.search as string | undefined;
   const sort = req.query.sort as string || "asc";
 
 	try {
-		let sql = "SELECT * FROM todos";
+		let sql = "SELECT * FROM subtasks";
 		const values: any[] = [];
 
 		if (search) {
@@ -26,51 +26,52 @@ export const fetchAllTodos = async (req: Request, res: Response) => {
 	}
 };
 
-// FETCH TODO
-export const fetchTodo = async (req: Request, res: Response) => {
+// FETCH SUBTASK
+export const fetchSubtask = async (req: Request, res: Response) => {
 	const id = req.params.id;
 
 	try {
 		const sql = `
-      SELECT * FROM todos 
+      SELECT * FROM subtasks 
       WHERE id = ?
     `;
 		const [rows] = await db.query<RowDataPacket[]>(sql, [id]);
-		const todo = rows[0];
-		if (!todo) {
-			res.status(404).json({ message: "Todo not found" });
+		const subtask = rows[0];
+		if (!subtask) {
+			res.status(404).json({ message: "Subtask not found" });
 			return;
 		}
-		res.json(todo);
+		res.json(subtask);
 	} catch (error: unknown) {
 		const message = error instanceof Error ? error.message : "Unknown error";
 		res.status(500).json({ error: message });
 	}
 };
 
-// CREATE TODO
-export const createTodo = async (req: Request, res: Response) => {
+// CREATE SUBTASK
+export const createSubtask = async (req: Request, res: Response) => {
+	const todo_id = req.body.todo_id;
 	const content = req.body.content;
-	if (content === undefined) {
-		res.status(400).json({ error: "Content is required" });
+	if (content === undefined || todo_id === undefined) {
+		res.status(400).json({ error: "Todo_id and content is required" });
 		return;
 	}
 
 	try {
 		const sql = `
-      INSERT INTO todos (content)
-      VALUES (?)
+      INSERT INTO subtasks (todo_id, content)
+      VALUES (?, ?)
     `;
-		const [result] = await db.query<ResultSetHeader>(sql, [content]);
-		res.status(201).json({ message: "Todo created", id: result.insertId });
+		const [result] = await db.query<ResultSetHeader>(sql, [todo_id, content]);
+		res.status(201).json({ message: "Subtask created", id: result.insertId });
 	} catch (error: unknown) {
 		const message = error instanceof Error ? error.message : "Unknown error";
 		res.status(500).json({ error: message });
 	}
 };
 
-// UPDATE TODO
-export const updateTodo = async (req: Request, res: Response) => {
+// UPDATE SUBTASK
+export const updateSubtask = async (req: Request, res: Response) => {
   const id = req.params.id;
   const { content, done } = req.body; // Destructur objektet från request body
 
@@ -81,39 +82,39 @@ export const updateTodo = async (req: Request, res: Response) => {
 
   try {
     const sql = `
-      UPDATE todos
+      UPDATE subtasks
       SET content = ?, done = ?
       WHERE id = ?
     `;
     const [result] = await db.query<ResultSetHeader>(sql, [content, done, id]);
 
     if (result.affectedRows === 0) {
-      res.status(404).json({ message: "Todo not found" });
+      res.status(404).json({ message: "Subtask not found" });
       return;
     }
 
-    res.json({ message: "Todo updated", data: { id, content, done } });
+    res.json({ message: "Subtask updated", data: { id, content, done } });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     res.status(500).json({ error: message });
   }
 };
 
-// DELETE TODO
-export const deleteTodo = async (req: Request, res: Response) => {
+// DELETE SUBTASK
+export const deleteSubtask = async (req: Request, res: Response) => {
 	const id = req.params.id;
 
 	try {
 		const sql = `
-      DELETE FROM todos
+      DELETE FROM subtasks
       WHERE id = ?
     `;
 		const [result] = await db.query<ResultSetHeader>(sql, [id]);
 		if (result.affectedRows === 0) {
-			res.status(404).json({ message: "Todo not found" });
+			res.status(404).json({ message: "Subtask not found" });
 			return;
 		}
-		res.json({ message: "Todo deleted" });
+		res.json({ message: "Subtask deleted" });
 	} catch (error: unknown) {
 		const message = error instanceof Error ? error.message : "Unknown error";
 		res.status(500).json({ error: message });

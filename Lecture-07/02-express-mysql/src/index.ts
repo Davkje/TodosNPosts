@@ -13,9 +13,10 @@ app.use(cors()); // This makes the Express server except request from other doma
 // Routes
 import todoRouter from "./routes/todos";
 app.use("/todos", todoRouter);
-
 import postRouter from "./routes/posts";
 app.use("/posts", postRouter);
+import subtaskRouter from "./routes/subtasks";
+app.use("/subtasks", subtaskRouter);
 
 // STATIC FILES
 const publicPatch = path.join(__dirname, "../public");
