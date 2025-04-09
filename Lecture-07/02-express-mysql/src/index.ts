@@ -17,6 +17,8 @@ import postRouter from "./routes/posts";
 app.use("/posts", postRouter);
 import subtaskRouter from "./routes/subtasks";
 app.use("/subtasks", subtaskRouter);
+import commentRouter from "./routes/comments";
+app.use("/comments", commentRouter);
 
 // STATIC FILES
 const publicPatch = path.join(__dirname, "../public");

@@ -7,7 +7,7 @@ const postSearch = document.getElementById("postSearch");
 const todoSort = document.getElementById("todoSort");
 const postSort = document.getElementById("postSort");
 
-// Get Todos
+// GET TODOS
 async function fetchTodos(search = "", sort = "asc") {
   try {
     const res = await fetch(`http://localhost:3000/todos?search=${encodeURIComponent(search)}&sort=${sort}`);
@@ -18,7 +18,17 @@ async function fetchTodos(search = "", sort = "asc") {
   }
 }
 
-// Get posts
+async function fetchTodoWithSubtasks(id) {
+  try {
+    const res = await fetch(`http://localhost:3000/todos/${id}`);
+    const todo = await res.json();
+    renderTodoDetails(todo);
+  } catch (error) {
+    console.error("Fel vid hämtning av todo med subtasks:", error);
+  }
+}
+
+// GET POSTS
 async function fetchPosts(search = "", sort = "asc") {
   try {
     const res = await fetch(`http://localhost:3000/posts?search=${encodeURIComponent(search)}&sort=${sort}`);
@@ -29,25 +39,107 @@ async function fetchPosts(search = "", sort = "asc") {
   }
 }
 
+// ------------------ RENDER -------------------
+
+// RENDER TODOS
 function renderTodos(todos) {
   todosList.innerHTML = "";
 
   todos.forEach((todo) => {
     const todoDiv = document.createElement("div");
     todoDiv.classList.add("todo-card");
+    todoDiv.style.cursor = "pointer";
 
-    const status = todo.done === 1 ? "Done" : "Not done"
+    const status = todo.done === 1 ? "✅ Done" : "❌ Not done";
 
     todoDiv.innerHTML = `
       <h3>${todo.content}</h3>
-      <p>${status}</p>
+      <p class="todo-status">${status}</p>
     `;
+
+    // Klick-event
+    todoDiv.addEventListener("click", () => {
+      fetchTodoWithSubtasks(todo.id);
+    });
 
     todosList.appendChild(todoDiv);
   });
 }
 
-// Ny renderPosts-funktion
+function renderTodoDetails(todo) {
+  const todoDetailContainer = document.createElement("div");
+  todoDetailContainer.classList.add("todo-details");
+
+  // Skapa HTML för subtasks om de finns
+  let subtasksSection = "";
+  if (todo.subtasks && todo.subtasks.length > 0) {
+    let subtasksHTML = "<ul>";
+    todo.subtasks.forEach(subtask => {
+      const status = subtask.done === 1 ? "✅" : "❌";
+      subtasksHTML += `<li>${status} ${subtask.content}</li>`;
+    });
+    subtasksHTML += "</ul>";
+    subtasksSection = `<h4>Subtasks</h4>${subtasksHTML}`;
+  }
+
+  // Lägg in allt i todo-detaljer
+  todoDetailContainer.innerHTML = `
+    <h3>${todo.content}</h3>
+    <h4>Status</h4> 
+    <p class="todo-status">${todo.done === 1 ? "✅ Done" : "❌ Not Done"}</p>
+    ${subtasksSection}
+  `;
+
+  // Byt ut innehållet i todosList mot den valda todo:n
+  todosList.innerHTML = "";
+  todosList.appendChild(todoDetailContainer);
+
+  // Lägg till tillbaka-knappen
+  const backButton = document.createElement("button");
+  backButton.textContent = "Stäng";
+  backButton.classList.add("back-button");
+  backButton.addEventListener("click", () => {
+    fetchTodos(); // hämta alla igen
+  });
+
+  todoDetailContainer.appendChild(backButton);
+}
+
+// function renderTodoDetails(todo) {
+//   const todoDetailContainer = document.createElement("div");
+//   todoDetailContainer.classList.add("todo-details");
+
+//   let subtasksHTML = "<ul>";
+//   todo.subtasks.forEach(subtask => {
+//     const status = subtask.done === 1 ? "✅" : "❌";
+//     subtasksHTML += `<li>${status} ${subtask.content}</li>`;
+//   });
+//   subtasksHTML += "</ul>";
+
+//   todoDetailContainer.innerHTML = `
+//     <h3>${todo.content}</h3>
+//     <p>Status: ${todo.done === 1 ? "✅ Done" : "❌ Not Done"}</p>
+//     <h4>Subtasks</h4>
+//     ${subtasksHTML}
+//   `;
+
+//   // Byt ut innehållet i todosList mot den valda todo:n
+//   todosList.innerHTML = "";
+//   todosList.appendChild(todoDetailContainer);
+
+//   // Lägg till en tillbaka-knapp INUTI todoDetailContainer
+//   const backButton = document.createElement("button");
+//   backButton.textContent = "⬅ Tillbaka till alla todos";
+//   backButton.classList.add("back-button");
+//   backButton.addEventListener("click", () => {
+//     fetchTodos(); // hämta alla igen
+//   });
+
+//   todoDetailContainer.appendChild(backButton); // Lägg den sist i detaljvyn
+// }
+
+
+// RENDER POSTS
 function renderPosts(posts) {
   postsList.innerHTML = "";
 

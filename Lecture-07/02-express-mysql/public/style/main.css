@@ -20,12 +20,54 @@ h1, h2, h3 {
   grid-auto-rows: 1fr;
   margin-bottom: 1rem;
   gap: 1rem;
-  .todo-card {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
+}  
+
+.todo-card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.todo-details {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.todo-status {
+  margin-bottom: 1rem;
+}
+
+ul {
+  padding: 0;
+  margin: 1rem 0;
+}
+
+li {
+  list-style: none;
+}
+
+.back-button {
+  background-color: rgb(194, 198, 221);
+  font-size: 1rem;
+  padding: .5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+  align-self: center;
+  transition: scale 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.back-button:hover {
+  scale: 1.05;
 }
 
 #posts {
